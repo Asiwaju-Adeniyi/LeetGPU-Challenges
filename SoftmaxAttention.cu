@@ -26,7 +26,7 @@ __global__ void softmax_kernel(const float* S, float* P, int M, int N) {
     __shared__ float shared_max[256];
     __shared__ float shared_sum[256];
 
-    // 1️⃣ Find row maximum
+    // Find row maximum
     float local_max = -INFINITY;
     for (int j = tid; j < N; j += num_threads)
         local_max = fmaxf(local_max, S[row * N + j]);
@@ -39,7 +39,7 @@ __global__ void softmax_kernel(const float* S, float* P, int M, int N) {
     }
     float row_max = shared_max[0];
 
-    // 2️⃣ Compute exp and sum
+    //Compute exp and sum
     float local_sum = 0.0f;
     for (int j = tid; j < N; j += num_threads) {
         float exp_val = expf(S[row * N + j] - row_max);
@@ -55,7 +55,7 @@ __global__ void softmax_kernel(const float* S, float* P, int M, int N) {
     }
     float row_sum = shared_sum[0];
 
-    // 3️⃣ Normalize
+    //Normalize
     for (int j = tid; j < N; j += num_threads)
         P[row * N + j] /= row_sum;
 }
